@@ -1,0 +1,141 @@
+*.log
+.DS_Store
+.env
+.env.backup
+.env.production
+.phpactor.json
+.phpunit.result.cache
+/.fleet
+/.idea
+/.nova
+/.phpunit.cache
+/.vscode
+/.zed
+/auth.json
+/node_modules
+/public/build
+/public/hot
+/public/storage
+/storage/*.key
+/storage/pail
+/vendor
+Homestead.json
+Homestead.yaml
+Thumbs.db
+
+
+
+# Learn more https://docs.github.com/en/get-started/getting-started-with-git/ignoring-files
+
+# ===================
+# Dependencies
+# ===================
+node_modules/
+.pnp/
+.pnp.js
+.yarn/
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions
+
+# ===================
+# Expo / React Native
+# ===================
+.expo/
+dist/
+web-build/
+expo-env.d.ts
+
+# Generated native folders
+/ios
+/android
+
+# Native build artifacts
+.kotlin/
+*.orig.*
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+*.hprof
+
+# Metro bundler
+.metro-health-check*
+
+# ===================
+# Build outputs
+# ===================
+build/
+out/
+*.bundle
+
+# ===================
+# Testing
+# ===================
+coverage/
+.nyc_output/
+*.lcov
+
+# ===================
+# Debug logs
+# ===================
+npm-debug.*
+yarn-debug.*
+yarn-error.*
+lerna-debug.log*
+*.log
+
+# ===================
+# Environment files
+# ===================
+.env
+.env.*
+.env*.local
+!.env.example
+!.env.sample
+
+# ===================
+# TypeScript
+# ===================
+*.tsbuildinfo
+tsconfig.tsbuildinfo
+
+# ===================
+# IDE / Editor
+# ===================
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+*.sublime-workspace
+*.sublime-project
+
+# ===================
+# OS generated files
+# ===================
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+*.pem
+
+# ===================
+# Misc
+# ===================
+*.local
+*.cache
+.cache/
+.temp/
+.tmp/
+tmp/
+temp/
+
+# App example folder
+app-example
