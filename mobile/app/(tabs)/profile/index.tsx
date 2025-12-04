@@ -3,7 +3,6 @@ import { View, Text, StyleSheet, TouchableOpacity, Alert, Image, SafeAreaView, S
 import { useRouter, useFocusEffect } from "expo-router";
 import { auth, API_BASE_URL } from "../../services/api";
 import { getToken, removeToken } from "../../services/auth";
-import { ThemedText } from "@/components/themed-text";
 
 export default function ProfileScreen() {
   const [user, setUser] = useState<any>(null);
@@ -50,7 +49,7 @@ export default function ProfileScreen() {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.loadingContainer}>
-          <ThemedText>Loading...</ThemedText>
+          <Text>Loading...</Text>
         </View>
       </SafeAreaView>
     );
@@ -60,7 +59,7 @@ export default function ProfileScreen() {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.loadingContainer}>
-          <ThemedText>No user found</ThemedText>
+          <Text>No user found</Text>
         </View>
       </SafeAreaView>
     );
@@ -77,24 +76,24 @@ export default function ProfileScreen() {
               <Text style={styles.avatarText}>{user.name?.charAt(0) || "U"}</Text>
             </View>
           )}
-          <ThemedText style={styles.name}>{user.name}</ThemedText>
-          <ThemedText style={styles.email}>{user.email}</ThemedText>
+          <Text style={styles.name}>{user.name}</Text>
+          <Text style={styles.email}>{user.email}</Text>
         </View>
 
         {user.bio && (
           <View style={styles.section}>
-            <ThemedText type="subtitle">About</ThemedText>
-            <ThemedText style={styles.bio}>{user.bio}</ThemedText>
+            <Text style={styles.subtitle}>About</Text>
+            <Text style={styles.bio}>{user.bio}</Text>
           </View>
         )}
 
         {user.specialties?.length > 0 && (
           <View style={styles.section}>
-            <ThemedText type="subtitle">Specialties</ThemedText>
+            <Text style={styles.subtitle}>Specialties</Text>
             <View style={styles.chipContainer}>
               {user.specialties.map((s: any) => (
                 <View key={s.id} style={styles.chip}>
-                  <ThemedText style={styles.chipText}>{s.name}</ThemedText>
+                  <Text style={styles.chipText}>{s.name}</Text>
                 </View>
               ))}
             </View>
@@ -103,12 +102,12 @@ export default function ProfileScreen() {
 
         {user.skills?.length > 0 && (
           <View style={styles.section}>
-            <ThemedText type="subtitle">Skills ({user.skills.length})</ThemedText>
+            <Text style={styles.subtitle}>Skills ({user.skills.length})</Text>
             <View style={styles.listContainer}>
               {user.skills.slice(0, 5).map((s: any) => (
                 <View key={s.id} style={styles.listItem}>
-                  <ThemedText>{s.name}</ThemedText>
-                  {s.category && <ThemedText style={styles.category}>{s.category}</ThemedText>}
+                  <Text>{s.name}</Text>
+                  {s.category && <Text style={styles.category}>{s.category}</Text>}
                 </View>
               ))}
             </View>
@@ -117,11 +116,11 @@ export default function ProfileScreen() {
 
         {user.courses?.length > 0 && (
           <View style={styles.section}>
-            <ThemedText type="subtitle">Courses ({user.courses.length})</ThemedText>
+            <Text style={styles.subtitle}>Courses ({user.courses.length})</Text>
             <View style={styles.listContainer}>
               {user.courses.slice(0, 5).map((c: any) => (
                 <View key={c.id} style={styles.listItem}>
-                  <ThemedText>{c.title}</ThemedText>
+                  <Text>{c.title}</Text>
                 </View>
               ))}
             </View>
@@ -130,14 +129,14 @@ export default function ProfileScreen() {
 
         {user.posts?.length > 0 && (
           <View style={styles.section}>
-            <ThemedText type="subtitle">Posts ({user.posts.length})</ThemedText>
+            <Text style={styles.subtitle}>Posts ({user.posts.length})</Text>
             <View style={styles.listContainer}>
               {user.posts.slice(0, 3).map((p: any) => (
                 <TouchableOpacity key={p.id} style={styles.postItem} onPress={() => router.push(`/posts/${p.id}`)}>
-                  <ThemedText style={{ fontWeight: "600" }}>{p.title || "(No title)"}</ThemedText>
-                  <ThemedText numberOfLines={2} style={styles.postContent}>
+                  <Text style={{ fontWeight: "600" }}>{p.title || "(No title)"}</Text>
+                  <Text numberOfLines={2} style={styles.postContent}>
                     {p.content}
-                  </ThemedText>
+                  </Text>
                 </TouchableOpacity>
               ))}
             </View>
@@ -145,34 +144,34 @@ export default function ProfileScreen() {
         )}
 
         <View style={styles.section}>
-          <ThemedText type="subtitle">Quick Actions</ThemedText>
+          <Text style={styles.subtitle}>Quick Actions</Text>
           <View style={styles.settingsList}>
             <TouchableOpacity style={styles.settingsItem} onPress={() => router.push("/posts/create")}>
-              <ThemedText>📝 Create a Post</ThemedText>
+              <Text>📝 Create a Post</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.settingsItem} onPress={() => router.push("/(tabs)/posts")}>
-              <ThemedText>📱 View All Posts</ThemedText>
+              <Text>📱 View All Posts</Text>
             </TouchableOpacity>
             <TouchableOpacity style={[styles.settingsItem, styles.logoutItem]} onPress={handleLogout}>
-              <ThemedText style={styles.logoutText}>🚪 Logout</ThemedText>
+              <Text style={styles.logoutText}>🚪 Logout</Text>
             </TouchableOpacity>
           </View>
         </View>
 
         <View style={styles.section}>
-          <ThemedText type="subtitle">Profile Settings</ThemedText>
+          <Text style={styles.subtitle}>Profile Settings</Text>
           <View style={styles.settingsList}>
             <TouchableOpacity style={styles.settingsItem} onPress={() => router.push("/(tabs)/profile/edit-profile")}>
-              <ThemedText>✏️ Edit Profile</ThemedText>
+              <Text>✏️ Edit Profile</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.settingsItem} onPress={() => router.push("/(tabs)/profile/upload-picture")}>
-              <ThemedText>📷 Change Profile Picture</ThemedText>
+              <Text>📷 Change Profile Picture</Text>
             </TouchableOpacity>
           </View>
         </View>
 
         <View style={styles.footer}>
-          <ThemedText style={styles.footerText}>BisaBelajar v1.0.0</ThemedText>
+          <Text style={styles.footerText}>BisaBelajar v1.0.0</Text>
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -230,6 +229,12 @@ const styles = StyleSheet.create({
   email: {
     fontSize: 14,
     color: "#666",
+  },
+  subtitle: {
+    fontSize: 16,
+    fontWeight: "700",
+    color: "#1f2937",
+    marginBottom: 8,
   },
   section: {
     backgroundColor: "#fff",

@@ -141,8 +141,8 @@ export default function PostsScreen() {
                 <TouchableOpacity style={styles.actionItem} onPress={() => router.push(`/users/${item.user?.id}`)}>
                   <ThemedText style={styles.actionText}>👤 View</ThemedText>
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.actionItem} onPress={() => router.push(`/chat?user_id=${item.user?.id}`)}>
-                  <ThemedText style={styles.actionText}>💬 Message</ThemedText>
+                <TouchableOpacity style={styles.actionItem} onPress={() => router.push(`/conversation?user_id=${item.user?.id}`)}>
+                  <ThemedText style={styles.actionItemText}>💬 Message</ThemedText>
                 </TouchableOpacity>
                 <TouchableOpacity style={styles.actionItem} onPress={() => router.push(`/posts/reply?thread_id=${item.id}`)}>
                   <ThemedText style={styles.actionText}>🔗 Reply</ThemedText>

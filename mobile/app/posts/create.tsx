@@ -1,12 +1,9 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { View, StyleSheet, TouchableOpacity, TextInput, Alert, ScrollView, Image } from "react-native";
+import { View, StyleSheet, TouchableOpacity, TextInput, Alert, ScrollView, Image, SafeAreaView, Text, ActivityIndicator } from "react-native";
 import { useRouter } from "expo-router";
 import * as ImagePicker from "expo-image-picker";
 import { posts, courses } from "../services/api";
 import { getToken } from "../services/auth";
-import ParallaxScrollView from "@/components/parallax-scroll-view";
-import { ThemedText } from "@/components/themed-text";
-import { ThemedView } from "@/components/themed-view";
 
 export default function CreatePostScreen() {
   const [formData, setFormData] = useState({ title: "", content: "", course_id: null });
@@ -85,7 +82,7 @@ export default function CreatePostScreen() {
       formDataObj.append("title", formData.title || "");
       formDataObj.append("content", formData.content);
       if (formData.course_id) {
-        formDataObj.append("course_id", formData.course_id);
+        formDataObj.append("course_id", String(formData.course_id));
       }
       if (selectedPhoto) {
         formDataObj.append("photo", {
@@ -108,125 +105,143 @@ export default function CreatePostScreen() {
   const selectedCourse = coursesList.find((c) => c.id === formData.course_id);
 
   return (
-    <ParallaxScrollView headerBackgroundColor={{ light: "#A1CEDC", dark: "#1D3D47" }} headerImage={<View />}>
-      <ThemedView style={styles.container}>
-        <View style={styles.header}>
-          <TouchableOpacity onPress={() => router.back()}>
-            <ThemedText style={styles.backButton}>← Back</ThemedText>
-          </TouchableOpacity>
-          <ThemedText type="title">Create Post</ThemedText>
-        </View>
+    <SafeAreaView style={styles.container}>
+      <View style={styles.header}>
+        <TouchableOpacity onPress={() => router.back()} style={styles.backButtonContainer}>
+          <Text style={styles.backButton}>← Back</Text>
+        </TouchableOpacity>
+        <Text style={styles.title}>Create Post</Text>
+      </View>
 
-        <ScrollView showsVerticalScrollIndicator={false}>
-          <ThemedView style={styles.form}>
-            <View style={styles.formGroup}>
-              <ThemedText style={styles.label}>Title (Optional)</ThemedText>
-              <TextInput style={styles.input} placeholder="Give your post a title..." value={formData.title} onChangeText={(text) => setFormData({ ...formData, title: text })} placeholderTextColor="#999" />
-            </View>
+      <ScrollView showsVerticalScrollIndicator={false} style={styles.scrollView}>
+        <View style={styles.form}>
+          <View style={styles.formGroup}>
+            <Text style={styles.label}>Title (Optional)</Text>
+            <TextInput style={styles.input} placeholder="Give your post a title..." value={formData.title} onChangeText={(text) => setFormData({ ...formData, title: text })} placeholderTextColor="#999" />
+          </View>
 
-            <View style={styles.formGroup}>
-              <ThemedText style={styles.label}>Content *</ThemedText>
-              <TextInput
-                style={[styles.input, styles.textArea]}
-                placeholder="Share your thoughts, tips, or experiences..."
-                value={formData.content}
-                onChangeText={(text) => setFormData({ ...formData, content: text })}
-                multiline
-                numberOfLines={6}
-                textAlignVertical="top"
-                placeholderTextColor="#999"
-              />
-              <ThemedText style={styles.characterCount}>{formData.content.length}/5000</ThemedText>
-            </View>
+          <View style={styles.formGroup}>
+            <Text style={styles.label}>Content *</Text>
+            <TextInput
+              style={[styles.input, styles.textArea]}
+              placeholder="Share your thoughts, tips, or experiences..."
+              value={formData.content}
+              onChangeText={(text) => setFormData({ ...formData, content: text })}
+              multiline
+              numberOfLines={6}
+              textAlignVertical="top"
+              placeholderTextColor="#999"
+            />
+            <Text style={styles.characterCount}>{formData.content.length}/5000</Text>
+          </View>
 
-            <View style={styles.formGroup}>
-              <ThemedText style={styles.label}>Add Photo (Optional)</ThemedText>
-              {selectedPhoto ? (
-                <View style={styles.photoPreviewContainer}>
-                  <Image source={{ uri: selectedPhoto.uri }} style={styles.photoPreview} />
-                  <TouchableOpacity style={styles.removePhotoButton} onPress={() => setSelectedPhoto(null)}>
-                    <ThemedText style={styles.removePhotoText}>✕</ThemedText>
-                  </TouchableOpacity>
-                </View>
-              ) : (
-                <View style={styles.photoButtonGroup}>
-                  <TouchableOpacity style={styles.photoButton} onPress={pickImage}>
-                    <ThemedText style={styles.photoButtonText}>📁 Choose Photo</ThemedText>
-                  </TouchableOpacity>
-                  <TouchableOpacity style={styles.photoButton} onPress={takePhoto}>
-                    <ThemedText style={styles.photoButtonText}>📷 Take Photo</ThemedText>
-                  </TouchableOpacity>
-                </View>
-              )}
-            </View>
+          <View style={styles.formGroup}>
+            <Text style={styles.label}>Add Photo (Optional)</Text>
+            {selectedPhoto ? (
+              <View style={styles.photoPreviewContainer}>
+                <Image source={{ uri: selectedPhoto.uri }} style={styles.photoPreview} />
+                <TouchableOpacity style={styles.removePhotoButton} onPress={() => setSelectedPhoto(null)}>
+                  <Text style={styles.removePhotoText}>✕</Text>
+                </TouchableOpacity>
+              </View>
+            ) : (
+              <View style={styles.photoButtonGroup}>
+                <TouchableOpacity style={styles.photoButton} onPress={pickImage}>
+                  <Text style={styles.photoButtonText}>📁 Choose Photo</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.photoButton} onPress={takePhoto}>
+                  <Text style={styles.photoButtonText}>📷 Take Photo</Text>
+                </TouchableOpacity>
+              </View>
+            )}
+          </View>
 
-            <View style={styles.formGroup}>
-              <ThemedText style={styles.label}>Related Course (Optional)</ThemedText>
-              <TouchableOpacity style={styles.courseSelector} onPress={() => setShowCoursePicker(!showCoursePicker)}>
-                <ThemedText style={styles.courseSelectorText}>{selectedCourse ? `📚 ${selectedCourse.title}` : "Select a course..."}</ThemedText>
-              </TouchableOpacity>
+          <View style={styles.formGroup}>
+            <Text style={styles.label}>Related Course (Optional)</Text>
+            <TouchableOpacity style={styles.courseSelector} onPress={() => setShowCoursePicker(!showCoursePicker)}>
+              <Text style={styles.courseSelectorText}>{selectedCourse ? `📚 ${selectedCourse.title}` : "Select a course..."}</Text>
+            </TouchableOpacity>
 
-              {showCoursePicker && coursesList.length > 0 && (
-                <View style={styles.coursePicker}>
+            {showCoursePicker && coursesList.length > 0 && (
+              <View style={styles.coursePicker}>
+                <TouchableOpacity
+                  style={styles.courseOption}
+                  onPress={() => {
+                    setFormData({ ...formData, course_id: null });
+                    setShowCoursePicker(false);
+                  }}
+                >
+                  <Text style={styles.courseOptionText}>None</Text>
+                </TouchableOpacity>
+                {coursesList.map((course: any) => (
                   <TouchableOpacity
-                    style={styles.courseOption}
+                    key={course.id}
+                    style={[styles.courseOption, formData.course_id === course.id && styles.courseOptionSelected]}
                     onPress={() => {
-                      setFormData({ ...formData, course_id: null });
+                      setFormData({ ...formData, course_id: course.id });
                       setShowCoursePicker(false);
                     }}
                   >
-                    <ThemedText style={styles.courseOptionText}>None</ThemedText>
+                    <Text style={[styles.courseOptionText, formData.course_id === course.id && styles.courseOptionTextSelected]}>📚 {course.title}</Text>
                   </TouchableOpacity>
-                  {coursesList.map((course: any) => (
-                    <TouchableOpacity
-                      key={course.id}
-                      style={[styles.courseOption, formData.course_id === course.id && styles.courseOptionSelected]}
-                      onPress={() => {
-                        setFormData({ ...formData, course_id: course.id });
-                        setShowCoursePicker(false);
-                      }}
-                    >
-                      <ThemedText style={[styles.courseOptionText, formData.course_id === course.id && styles.courseOptionTextSelected]}>📚 {course.title}</ThemedText>
-                    </TouchableOpacity>
-                  ))}
-                </View>
-              )}
-            </View>
+                ))}
+              </View>
+            )}
+          </View>
 
-            <TouchableOpacity style={[styles.postButton, posting && styles.postButtonDisabled]} onPress={handlePost} disabled={posting}>
-              <ThemedText style={styles.postButtonText}>{posting ? "Publishing..." : "📤 Publish Post"}</ThemedText>
-            </TouchableOpacity>
+          <TouchableOpacity style={[styles.postButton, posting && styles.postButtonDisabled]} onPress={handlePost} disabled={posting}>
+            {posting ? <ActivityIndicator color="#fff" size="small" /> : <Text style={styles.postButtonText}>📤 Publish Post</Text>}
+          </TouchableOpacity>
 
-            <TouchableOpacity style={styles.cancelButton} onPress={() => router.back()}>
-              <ThemedText style={styles.cancelButtonText}>Cancel</ThemedText>
-            </TouchableOpacity>
-          </ThemedView>
-        </ScrollView>
-      </ThemedView>
-    </ParallaxScrollView>
+          <TouchableOpacity style={styles.cancelButton} onPress={() => router.back()}>
+            <Text style={styles.cancelButtonText}>Cancel</Text>
+          </TouchableOpacity>
+        </View>
+      </ScrollView>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { padding: 16, backgroundColor: "#f7fafc", minHeight: "100%" },
+  container: {
+    flex: 1,
+    backgroundColor: "#f7fafc",
+  },
   header: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 24,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
     gap: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: "#e5e7eb",
+  },
+  backButtonContainer: {
+    padding: 8,
+    marginHorizontal: -8,
   },
   backButton: {
     fontSize: 16,
-    color: "#0ea5a3",
+    color: "#0ea5e9",
     fontWeight: "600",
+  },
+  title: {
+    fontSize: 20,
+    fontWeight: "700",
+    color: "#1f2937",
+  },
+  scrollView: {
+    flex: 1,
   },
   form: {
     backgroundColor: "#fff",
     padding: 16,
+    margin: 12,
     borderRadius: 12,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
+    shadowOpacity: 0.08,
+    shadowRadius: 4,
     elevation: 3,
   },
   formGroup: {
@@ -236,15 +251,16 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: "600",
     marginBottom: 8,
-    color: "#333",
+    color: "#374151",
   },
   input: {
     borderWidth: 1,
-    borderColor: "#e5e7eb",
+    borderColor: "#d1d5db",
     borderRadius: 8,
     padding: 12,
     fontSize: 14,
     backgroundColor: "#f9fafb",
+    color: "#1f2937",
   },
   textArea: {
     height: 120,
@@ -252,24 +268,24 @@ const styles = StyleSheet.create({
   },
   characterCount: {
     fontSize: 12,
-    color: "#999",
+    color: "#9ca3af",
     marginTop: 4,
     textAlign: "right",
   },
   courseSelector: {
     borderWidth: 1,
-    borderColor: "#e5e7eb",
+    borderColor: "#d1d5db",
     borderRadius: 8,
     padding: 12,
     backgroundColor: "#f9fafb",
   },
   courseSelectorText: {
     fontSize: 14,
-    color: "#333",
+    color: "#1f2937",
   },
   coursePicker: {
     borderWidth: 1,
-    borderColor: "#e5e7eb",
+    borderColor: "#d1d5db",
     borderRadius: 8,
     marginTop: 8,
     maxHeight: 200,
@@ -282,22 +298,28 @@ const styles = StyleSheet.create({
     borderBottomColor: "#e5e7eb",
   },
   courseOptionSelected: {
-    backgroundColor: "#eef2ff",
+    backgroundColor: "#eff6ff",
   },
   courseOptionText: {
     fontSize: 14,
-    color: "#333",
+    color: "#1f2937",
   },
   courseOptionTextSelected: {
-    color: "#0ea5a3",
+    color: "#0ea5e9",
     fontWeight: "600",
   },
   postButton: {
-    backgroundColor: "#0ea5a3",
+    backgroundColor: "#0ea5e9",
     paddingVertical: 12,
     borderRadius: 8,
     alignItems: "center",
+    justifyContent: "center",
     marginTop: 8,
+    shadowColor: "#0ea5e9",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3,
+    elevation: 5,
   },
   postButtonDisabled: {
     opacity: 0.6,
@@ -308,14 +330,16 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   cancelButton: {
-    backgroundColor: "#e5e7eb",
+    backgroundColor: "#f3f4f6",
     paddingVertical: 12,
     borderRadius: 8,
     alignItems: "center",
     marginTop: 8,
+    borderWidth: 1,
+    borderColor: "#d1d5db",
   },
   cancelButtonText: {
-    color: "#333",
+    color: "#374151",
     fontWeight: "600",
     fontSize: 16,
   },
@@ -325,15 +349,16 @@ const styles = StyleSheet.create({
   },
   photoButton: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: "#eff6ff",
     borderWidth: 2,
-    borderColor: "#0ea5a3",
+    borderColor: "#0ea5e9",
     paddingVertical: 12,
     borderRadius: 8,
     alignItems: "center",
+    justifyContent: "center",
   },
   photoButtonText: {
-    color: "#0ea5a3",
+    color: "#0ea5e9",
     fontWeight: "600",
     fontSize: 13,
   },
@@ -344,6 +369,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     overflow: "hidden",
     marginBottom: 8,
+    backgroundColor: "#f3f4f6",
   },
   photoPreview: {
     width: "100%",
@@ -357,9 +383,14 @@ const styles = StyleSheet.create({
     width: 32,
     height: 32,
     borderRadius: 16,
-    backgroundColor: "#b91c1c",
+    backgroundColor: "#dc2626",
     alignItems: "center",
     justifyContent: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3,
+    elevation: 5,
   },
   removePhotoText: {
     color: "#fff",

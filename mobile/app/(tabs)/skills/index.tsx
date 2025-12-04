@@ -50,7 +50,7 @@ export default function SkillsScreen() {
                 View profile
               </Text>{" "}
               ·{" "}
-              <Text style={{ color: "#0ea5a3" }} onPress={() => router.push(`/chat?user_id=${item.user_id}`)}>
+              <Text style={{ color: "#0ea5a3" }} onPress={() => router.push(`/conversation?user_id=${item.user_id}`)}>
                 Chat
               </Text>
             </Text>

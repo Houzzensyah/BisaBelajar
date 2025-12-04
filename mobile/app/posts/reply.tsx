@@ -1,12 +1,9 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { View, StyleSheet, TouchableOpacity, TextInput, Alert, ScrollView, Image } from "react-native";
+import { View, StyleSheet, TouchableOpacity, TextInput, Alert, ScrollView, Image, SafeAreaView, ActivityIndicator, Text } from "react-native";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import * as ImagePicker from "expo-image-picker";
 import { posts } from "../services/api";
 import { getToken } from "../services/auth";
-import ParallaxScrollView from "@/components/parallax-scroll-view";
-import { ThemedText } from "@/components/themed-text";
-import { ThemedView } from "@/components/themed-view";
 
 export default function ReplyScreen() {
   const [content, setContent] = useState("");
@@ -89,7 +86,7 @@ export default function ReplyScreen() {
     try {
       const formDataObj = new FormData();
       formDataObj.append("content", content);
-      formDataObj.append("thread_id", thread_id || "");
+      formDataObj.append("thread_id", String(thread_id || ""));
 
       if (selectedPhoto) {
         formDataObj.append("photo", {
@@ -111,117 +108,150 @@ export default function ReplyScreen() {
 
   if (loading) {
     return (
-      <ParallaxScrollView headerBackgroundColor={{ light: "#A1CEDC", dark: "#1D3D47" }} headerImage={<View />}>
-        <ThemedView style={styles.container}>
-          <ThemedText>Loading thread...</ThemedText>
-        </ThemedView>
-      </ParallaxScrollView>
+      <SafeAreaView style={styles.container}>
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color="#0ea5e9" />
+          <Text style={styles.loadingText}>Loading thread...</Text>
+        </View>
+      </SafeAreaView>
     );
   }
 
   return (
-    <ParallaxScrollView headerBackgroundColor={{ light: "#A1CEDC", dark: "#1D3D47" }} headerImage={<View />}>
-      <ThemedView style={styles.container}>
-        <View style={styles.header}>
-          <TouchableOpacity onPress={() => router.back()}>
-            <ThemedText style={styles.backButton}>← Back</ThemedText>
-          </TouchableOpacity>
-          <ThemedText type="title">Reply to Thread</ThemedText>
-        </View>
+    <SafeAreaView style={styles.safeArea}>
+      <View style={styles.header}>
+        <TouchableOpacity onPress={() => router.back()} style={styles.backButtonContainer}>
+          <Text style={styles.backButton}>← Back</Text>
+        </TouchableOpacity>
+        <Text style={styles.title}>Reply to Thread</Text>
+      </View>
 
+      <ScrollView showsVerticalScrollIndicator={false} style={styles.scrollView}>
         {/* Original Thread Preview */}
         {thread && (
           <View style={styles.threadPreview}>
             <View style={styles.threadHeader}>
               <View style={styles.threadAvatar}>
-                <ThemedText style={styles.threadAvatarText}>{thread.user?.name?.charAt(0) || "U"}</ThemedText>
+                <Text style={styles.threadAvatarText}>{thread.user?.name?.charAt(0) || "U"}</Text>
               </View>
               <View style={styles.threadUserDetails}>
-                <ThemedText style={styles.threadUserName}>{thread.user?.name}</ThemedText>
-                <ThemedText style={styles.threadDate}>{new Date(thread.created_at).toLocaleDateString()}</ThemedText>
+                <Text style={styles.threadUserName}>{thread.user?.name}</Text>
+                <Text style={styles.threadDate}>{new Date(thread.created_at).toLocaleDateString()}</Text>
               </View>
             </View>
-            {thread.title && <ThemedText style={styles.threadTitle}>{thread.title}</ThemedText>}
-            <ThemedText style={styles.threadContent}>{thread.content}</ThemedText>
+            {thread.title && <Text style={styles.threadTitle}>{thread.title}</Text>}
+            <Text style={styles.threadContent}>{thread.content}</Text>
           </View>
         )}
 
-        <ScrollView showsVerticalScrollIndicator={false}>
-          <ThemedView style={styles.form}>
-            <View style={styles.formGroup}>
-              <ThemedText style={styles.label}>Your Reply *</ThemedText>
-              <TextInput
-                style={[styles.input, styles.textArea]}
-                placeholder="Share your thoughts about this thread..."
-                value={content}
-                onChangeText={setContent}
-                multiline
-                numberOfLines={5}
-                textAlignVertical="top"
-                placeholderTextColor="#999"
-              />
-              <ThemedText style={styles.characterCount}>{content.length}/5000</ThemedText>
-            </View>
+        <View style={styles.form}>
+          <View style={styles.formGroup}>
+            <Text style={styles.label}>Your Reply *</Text>
+            <TextInput
+              style={[styles.input, styles.textArea]}
+              placeholder="Share your thoughts about this thread..."
+              value={content}
+              onChangeText={setContent}
+              multiline
+              numberOfLines={5}
+              textAlignVertical="top"
+              placeholderTextColor="#999"
+            />
+            <Text style={styles.characterCount}>{content.length}/5000</Text>
+          </View>
 
-            <View style={styles.formGroup}>
-              <ThemedText style={styles.label}>Add Photo (Optional)</ThemedText>
-              {selectedPhoto ? (
-                <View style={styles.photoPreviewContainer}>
-                  <Image source={{ uri: selectedPhoto.uri }} style={styles.photoPreview} />
-                  <TouchableOpacity style={styles.removePhotoButton} onPress={() => setSelectedPhoto(null)}>
-                    <ThemedText style={styles.removePhotoText}>✕</ThemedText>
-                  </TouchableOpacity>
-                </View>
-              ) : (
-                <View style={styles.photoButtonGroup}>
-                  <TouchableOpacity style={styles.photoButton} onPress={pickImage}>
-                    <ThemedText style={styles.photoButtonText}>📁 Choose Photo</ThemedText>
-                  </TouchableOpacity>
-                  <TouchableOpacity style={styles.photoButton} onPress={takePhoto}>
-                    <ThemedText style={styles.photoButtonText}>📷 Take Photo</ThemedText>
-                  </TouchableOpacity>
-                </View>
-              )}
-            </View>
+          <View style={styles.formGroup}>
+            <Text style={styles.label}>Add Photo (Optional)</Text>
+            {selectedPhoto ? (
+              <View style={styles.photoPreviewContainer}>
+                <Image source={{ uri: selectedPhoto.uri }} style={styles.photoPreview} />
+                <TouchableOpacity style={styles.removePhotoButton} onPress={() => setSelectedPhoto(null)}>
+                  <Text style={styles.removePhotoText}>✕</Text>
+                </TouchableOpacity>
+              </View>
+            ) : (
+              <View style={styles.photoButtonGroup}>
+                <TouchableOpacity style={styles.photoButton} onPress={pickImage}>
+                  <Text style={styles.photoButtonText}>📁 Choose Photo</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.photoButton} onPress={takePhoto}>
+                  <Text style={styles.photoButtonText}>📷 Take Photo</Text>
+                </TouchableOpacity>
+              </View>
+            )}
+          </View>
 
-            <TouchableOpacity style={[styles.postButton, posting && styles.postButtonDisabled]} onPress={handleReply} disabled={posting}>
-              <ThemedText style={styles.postButtonText}>{posting ? "Posting..." : "📤 Post Reply"}</ThemedText>
-            </TouchableOpacity>
+          <TouchableOpacity style={[styles.postButton, posting && styles.postButtonDisabled]} onPress={handleReply} disabled={posting}>
+            {posting ? <ActivityIndicator color="#fff" size="small" /> : <Text style={styles.postButtonText}>📤 Post Reply</Text>}
+          </TouchableOpacity>
 
-            <TouchableOpacity style={styles.cancelButton} onPress={() => router.back()}>
-              <ThemedText style={styles.cancelButtonText}>Cancel</ThemedText>
-            </TouchableOpacity>
-          </ThemedView>
-        </ScrollView>
-      </ThemedView>
-    </ParallaxScrollView>
+          <TouchableOpacity style={styles.cancelButton} onPress={() => router.back()}>
+            <Text style={styles.cancelButtonText}>Cancel</Text>
+          </TouchableOpacity>
+        </View>
+      </ScrollView>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { padding: 16, backgroundColor: "#f7fafc", minHeight: "100%" },
+  safeArea: {
+    flex: 1,
+    backgroundColor: "#f7fafc",
+  },
+  container: {
+    flex: 1,
+    backgroundColor: "#f7fafc",
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    gap: 12,
+  },
+  loadingText: {
+    fontSize: 16,
+    color: "#6b7280",
+  },
+  scrollView: {
+    flex: 1,
+    paddingHorizontal: 12,
+  },
   header: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 16,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
     gap: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: "#e5e7eb",
+  },
+  backButtonContainer: {
+    padding: 8,
+    marginHorizontal: -8,
   },
   backButton: {
     fontSize: 16,
-    color: "#0ea5a3",
+    color: "#0ea5e9",
     fontWeight: "600",
   },
+  title: {
+    fontSize: 20,
+    fontWeight: "700",
+    color: "#1f2937",
+  },
   threadPreview: {
-    backgroundColor: "#fff",
+    backgroundColor: "#eff6ff",
     padding: 16,
     borderRadius: 12,
     marginBottom: 16,
+    marginTop: 12,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.05,
     elevation: 1,
-    borderLeftWidth: 3,
-    borderLeftColor: "#0ea5a3",
+    borderLeftWidth: 4,
+    borderLeftColor: "#0ea5e9",
   },
   threadHeader: {
     flexDirection: "row",
@@ -232,7 +262,7 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: "#0ea5a3",
+    backgroundColor: "#0ea5e9",
     alignItems: "center",
     justifyContent: "center",
     marginRight: 12,
@@ -252,27 +282,30 @@ const styles = StyleSheet.create({
   },
   threadDate: {
     fontSize: 11,
-    color: "#999",
+    color: "#9ca3af",
     marginTop: 2,
   },
   threadTitle: {
     fontSize: 14,
     fontWeight: "600",
     marginBottom: 8,
-    color: "#333",
+    color: "#1f2937",
   },
   threadContent: {
     fontSize: 13,
-    color: "#666",
+    color: "#4b5563",
     lineHeight: 19,
   },
   form: {
     backgroundColor: "#fff",
     padding: 16,
+    margin: 12,
     borderRadius: 12,
+    marginBottom: 24,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
+    shadowOpacity: 0.08,
+    shadowRadius: 4,
     elevation: 3,
   },
   formGroup: {
@@ -282,15 +315,16 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: "600",
     marginBottom: 8,
-    color: "#333",
+    color: "#374151",
   },
   input: {
     borderWidth: 1,
-    borderColor: "#e5e7eb",
+    borderColor: "#d1d5db",
     borderRadius: 8,
     padding: 12,
     fontSize: 14,
     backgroundColor: "#f9fafb",
+    color: "#1f2937",
   },
   textArea: {
     height: 100,
@@ -298,16 +332,22 @@ const styles = StyleSheet.create({
   },
   characterCount: {
     fontSize: 12,
-    color: "#999",
+    color: "#9ca3af",
     marginTop: 4,
     textAlign: "right",
   },
   postButton: {
-    backgroundColor: "#0ea5a3",
+    backgroundColor: "#0ea5e9",
     paddingVertical: 12,
     borderRadius: 8,
     alignItems: "center",
+    justifyContent: "center",
     marginTop: 8,
+    shadowColor: "#0ea5e9",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3,
+    elevation: 5,
   },
   postButtonDisabled: {
     opacity: 0.6,
@@ -318,14 +358,16 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   cancelButton: {
-    backgroundColor: "#e5e7eb",
+    backgroundColor: "#f3f4f6",
     paddingVertical: 12,
     borderRadius: 8,
     alignItems: "center",
     marginTop: 8,
+    borderWidth: 1,
+    borderColor: "#d1d5db",
   },
   cancelButtonText: {
-    color: "#333",
+    color: "#374151",
     fontWeight: "600",
     fontSize: 16,
   },
@@ -335,15 +377,16 @@ const styles = StyleSheet.create({
   },
   photoButton: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: "#eff6ff",
     borderWidth: 2,
-    borderColor: "#0ea5a3",
+    borderColor: "#0ea5e9",
     paddingVertical: 12,
     borderRadius: 8,
     alignItems: "center",
+    justifyContent: "center",
   },
   photoButtonText: {
-    color: "#0ea5a3",
+    color: "#0ea5e9",
     fontWeight: "600",
     fontSize: 13,
   },
@@ -354,6 +397,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     overflow: "hidden",
     marginBottom: 8,
+    backgroundColor: "#f3f4f6",
   },
   photoPreview: {
     width: "100%",
@@ -367,9 +411,14 @@ const styles = StyleSheet.create({
     width: 32,
     height: 32,
     borderRadius: 16,
-    backgroundColor: "#b91c1c",
+    backgroundColor: "#dc2626",
     alignItems: "center",
     justifyContent: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3,
+    elevation: 5,
   },
   removePhotoText: {
     color: "#fff",

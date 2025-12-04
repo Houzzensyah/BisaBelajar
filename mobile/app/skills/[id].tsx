@@ -40,7 +40,7 @@ export default function SkillDetail() {
         <View style={{ marginTop: 12 }}>
           <Button title="Back" onPress={() => router.back()} />
           <View style={{ marginTop: 8 }}>
-            <Button title="Message owner" onPress={() => router.push(`/chat?user_id=${skill.user.id}`)} />
+            <Button title="Message owner" onPress={() => router.push(`/conversation?user_id=${skill.user.id}`)} />
           </View>
         </View>
       </View>

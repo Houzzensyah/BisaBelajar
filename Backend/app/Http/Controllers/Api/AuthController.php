@@ -96,8 +96,7 @@ class AuthController extends Controller
         $path = $request->file('avatar')->store('avatars', 'public');
         $user->update(['avatar_path' => $path]);
 
-        $avatarUrl = env('APP_URL') . '/storage/' . $path;
-        return response()->json(['message' => 'Profile picture updated', 'avatar_url' => $avatarUrl]);
+        return response()->json(['message' => 'Profile picture updated', 'user' => $user->load('skills', 'courses', 'posts', 'specialties')]);
     }
 }
 

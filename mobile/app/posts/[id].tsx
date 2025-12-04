@@ -40,7 +40,7 @@ export default function PostDetail() {
           </View>
         ) : null}
         <View style={{ marginTop: 12 }}>
-          <Button title="Message author" onPress={() => router.push(`/chat?user_id=${post.user.id}`)} />
+          <Button title="Message author" onPress={() => router.push(`/conversation?user_id=${post.user.id}`)} />
         </View>
       </View>
     </ScrollView>

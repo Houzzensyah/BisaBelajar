@@ -83,7 +83,7 @@ export default function ChatListScreen() {
 
   const handleStartSelfChat = () => {
     if (currentUser?.id) {
-      router.push(`/chat?user_id=${currentUser.id}`);
+      router.push(`/conversation?user_id=${currentUser.id}`);
     }
   };
 
@@ -128,7 +128,7 @@ export default function ChatListScreen() {
             const displayName = item.isSelf ? "Notes to myself" : item.partner?.name || "Unknown";
 
             return (
-              <TouchableOpacity style={styles.conversationItem} onPress={() => router.push(`/chat?user_id=${item.partnerId}`)}>
+              <TouchableOpacity style={styles.conversationItem} onPress={() => router.push(`/conversation?user_id=${item.partnerId}`)}>
                 {item.partner?.avatar_path ? (
                   <Image source={{ uri: API_BASE_URL.replace(/\/api$/, "") + "/" + item.partner.avatar_path }} style={styles.avatar} />
                 ) : (

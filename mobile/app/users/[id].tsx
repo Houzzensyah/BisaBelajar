@@ -63,7 +63,7 @@ export default function UserProfile() {
           ))}
         </View>
       ) : null}
-      <Button title="Message" onPress={() => router.push(`/chat?user_id=${user.id}`)} />
+      <Button title="Message" onPress={() => router.push(`/conversation?user_id=${user.id}`)} />
       <Button
         title="Call"
         onPress={async () => {

@@ -88,7 +88,7 @@ export default function HomeScreen() {
                   ) : null}
                 </View>
                 <View style={styles.postActions}>
-                  <TouchableOpacity style={styles.actionButton} onPress={() => router.push(`/chat?user_id=${item.user?.id}`)}>
+                  <TouchableOpacity style={styles.actionButton} onPress={() => router.push(`/conversation?user_id=${item.user?.id}`)}>
                     <ThemedText style={styles.actionButtonText}>💬 Message</ThemedText>
                   </TouchableOpacity>
                   <TouchableOpacity style={styles.actionButton} onPress={() => router.push(`/posts/${item.id}`)}>

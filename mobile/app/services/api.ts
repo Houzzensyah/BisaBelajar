@@ -75,6 +75,7 @@ export type Skill = {
   name: string;
   category?: string | null;
   description?: string | null;
+  user?: { id: number; name: string; email?: string };
 };
 
 export const auth = {
