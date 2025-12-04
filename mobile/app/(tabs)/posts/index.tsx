@@ -1,11 +1,9 @@
 import React, { useState, useCallback } from "react";
-import { View, FlatList, StyleSheet, TouchableOpacity, Image } from "react-native";
+import { View, FlatList, StyleSheet, TouchableOpacity, Image, SafeAreaView } from "react-native";
 import { useRouter, useFocusEffect } from "expo-router";
 import { posts, auth } from "../../services/api";
 import { getToken } from "../../services/auth";
-import ParallaxScrollView from "@/components/parallax-scroll-view";
 import { ThemedText } from "@/components/themed-text";
-import { ThemedView } from "@/components/themed-view";
 
 const getImageUrl = (photoUrl: string | null): string | null => {
   if (!photoUrl) return null;
@@ -32,7 +30,10 @@ export default function PostsScreen() {
       }
 
       const [postsRes, userRes] = await Promise.all([posts.list(), auth.me()]);
-      setPostsList(postsRes.data.data || postsRes.data || []);
+      const allPosts = postsRes.data.data || postsRes.data || [];
+      // Filter to show only current user's posts
+      const userPosts = allPosts.filter((post: any) => post.user_id === userRes.data.id);
+      setPostsList(userPosts);
       setCurrentUser(userRes.data);
     } catch (err) {
       console.warn("Error loading posts:", err);
@@ -59,153 +60,156 @@ export default function PostsScreen() {
 
   if (loading) {
     return (
-      <ParallaxScrollView headerBackgroundColor={{ light: "#A1CEDC", dark: "#1D3D47" }} headerImage={<View />}>
-        <ThemedView style={styles.container}>
+      <SafeAreaView style={styles.container}>
+        <View style={styles.loadingContainer}>
           <ThemedText>Loading posts...</ThemedText>
-        </ThemedView>
-      </ParallaxScrollView>
+        </View>
+      </SafeAreaView>
     );
   }
 
   return (
-    <ParallaxScrollView headerBackgroundColor={{ light: "#A1CEDC", dark: "#1D3D47" }} headerImage={<View />}>
-      <ThemedView style={styles.container}>
-        <View style={styles.header}>
-          <ThemedText type="title">📱 Posts Feed</ThemedText>
-          <TouchableOpacity onPress={() => router.push("/posts/create")} style={styles.createButton}>
-            <ThemedText style={styles.createButtonText}>+ New</ThemedText>
-          </TouchableOpacity>
-        </View>
+    <SafeAreaView style={styles.container}>
+      <View style={styles.header}>
+        <ThemedText type="title">📝 My Posts</ThemedText>
+        <TouchableOpacity onPress={() => router.push("/posts/create")} style={styles.createButton}>
+          <ThemedText style={styles.createButtonText}>+ New</ThemedText>
+        </TouchableOpacity>
+      </View>
 
-        <FlatList
-          scrollEnabled={false}
-          data={postsList}
-          keyExtractor={(p) => String(p.id)}
-          refreshing={refreshing}
-          onRefresh={onRefresh}
-          ListEmptyComponent={
-            <View style={styles.emptyContainer}>
-              <ThemedText style={styles.emptyText}>No posts yet</ThemedText>
-              <TouchableOpacity onPress={() => router.push("/posts/create")} style={styles.createPostButton}>
-                <ThemedText style={styles.createPostButtonText}>Create your first post 📝</ThemedText>
-              </TouchableOpacity>
-            </View>
-          }
-          renderItem={({ item }) => (
-            <View style={styles.threadContainer}>
-              {/* Main Thread Post */}
-              <View style={styles.postContainer}>
-                {/* Post Header */}
-                <View style={styles.postHeader}>
-                  <View style={styles.userInfo}>
-                    <View style={styles.avatar}>
-                      <ThemedText style={styles.avatarText}>{item.user?.name?.charAt(0) || "U"}</ThemedText>
-                    </View>
-                    <View style={styles.userDetails}>
-                      <ThemedText style={styles.userName}>{item.user?.name}</ThemedText>
-                      <ThemedText style={styles.postDate}>{new Date(item.created_at).toLocaleDateString()}</ThemedText>
-                    </View>
+      <FlatList
+        scrollEnabled={false}
+        data={postsList}
+        keyExtractor={(p) => String(p.id)}
+        refreshing={refreshing}
+        onRefresh={onRefresh}
+        ListEmptyComponent={
+          <View style={styles.emptyContainer}>
+            <ThemedText style={styles.emptyText}>No posts yet</ThemedText>
+            <TouchableOpacity onPress={() => router.push("/posts/create")} style={styles.createPostButton}>
+              <ThemedText style={styles.createPostButtonText}>Create your first post 📝</ThemedText>
+            </TouchableOpacity>
+          </View>
+        }
+        renderItem={({ item }) => (
+          <View style={styles.threadContainer}>
+            {/* Main Thread Post */}
+            <View style={styles.postContainer}>
+              {/* Post Header */}
+              <View style={styles.postHeader}>
+                <View style={styles.userInfo}>
+                  <View style={styles.avatar}>
+                    <ThemedText style={styles.avatarText}>{item.user?.name?.charAt(0) || "U"}</ThemedText>
                   </View>
-                  {currentUser?.id === item.user_id && (
-                    <TouchableOpacity
-                      onPress={() => {
-                        posts.delete(item.id);
-                        handleDeletePost(item.id);
-                      }}
-                    >
-                      <ThemedText style={styles.deleteButton}>⋮</ThemedText>
-                    </TouchableOpacity>
-                  )}
-                </View>
-
-                {/* Post Title */}
-                {item.title && <ThemedText style={styles.postTitle}>{item.title}</ThemedText>}
-
-                {/* Post Photo */}
-                {item.photo_url && getImageUrl(item.photo_url) && <Image source={{ uri: getImageUrl(item.photo_url)! }} style={styles.postPhoto} />}
-
-                {/* Post Content */}
-                <View style={styles.postContent}>
-                  <ThemedText style={styles.postText}>{item.content}</ThemedText>
-                </View>
-
-                {/* Related Course */}
-                {item.course && (
-                  <View style={styles.courseTag}>
-                    <ThemedText style={styles.courseTagText}>📚 Course: {item.course.title}</ThemedText>
+                  <View style={styles.userDetails}>
+                    <ThemedText style={styles.userName}>{item.user?.name}</ThemedText>
+                    <ThemedText style={styles.postDate}>{new Date(item.created_at).toLocaleDateString()}</ThemedText>
                   </View>
+                </View>
+                {currentUser?.id === item.user_id && (
+                  <TouchableOpacity
+                    onPress={() => {
+                      posts.delete(item.id);
+                      handleDeletePost(item.id);
+                    }}
+                  >
+                    <ThemedText style={styles.deleteButton}>⋮</ThemedText>
+                  </TouchableOpacity>
                 )}
-
-                {/* Post Actions */}
-                <View style={styles.postActions}>
-                  <TouchableOpacity style={styles.actionItem} onPress={() => router.push(`/users/${item.user?.id}`)}>
-                    <ThemedText style={styles.actionText}>👤 View</ThemedText>
-                  </TouchableOpacity>
-                  <TouchableOpacity style={styles.actionItem} onPress={() => router.push(`/chat?user_id=${item.user?.id}`)}>
-                    <ThemedText style={styles.actionText}>💬 Message</ThemedText>
-                  </TouchableOpacity>
-                  <TouchableOpacity style={styles.actionItem} onPress={() => router.push(`/posts/reply?thread_id=${item.id}`)}>
-                    <ThemedText style={styles.actionText}>🔗 Reply</ThemedText>
-                  </TouchableOpacity>
-                </View>
               </View>
 
-              {/* Thread Replies */}
-              {item.replies && item.replies.length > 0 && (
-                <View style={styles.repliesContainer}>
-                  <View style={styles.threadLine} />
-                  {item.replies.map((reply: any) => (
-                    <View key={reply.id} style={styles.replyContainer}>
-                      <View style={styles.replyHeader}>
-                        <View style={styles.replyAvatar}>
-                          <ThemedText style={styles.replyAvatarText}>{reply.user?.name?.charAt(0) || "U"}</ThemedText>
-                        </View>
-                        <View style={styles.replyUserDetails}>
-                          <ThemedText style={styles.replyUserName}>{reply.user?.name}</ThemedText>
-                          <ThemedText style={styles.replyDate}>{new Date(reply.created_at).toLocaleDateString()}</ThemedText>
-                        </View>
-                        {currentUser?.id === reply.user_id && (
-                          <TouchableOpacity
-                            onPress={() => {
-                              posts.delete(reply.id);
-                              loadPosts();
-                            }}
-                          >
-                            <ThemedText style={styles.replyDeleteButton}>⋮</ThemedText>
-                          </TouchableOpacity>
-                        )}
-                      </View>
-                      {reply.photo_url && getImageUrl(reply.photo_url) && <Image source={{ uri: getImageUrl(reply.photo_url)! }} style={styles.replyPhoto} />}
-                      <View style={styles.replyContent}>
-                        <ThemedText style={styles.replyText}>{reply.content}</ThemedText>
-                      </View>
-                    </View>
-                  ))}
-                  {/* Add Reply Button in Thread */}
-                  <TouchableOpacity style={styles.addReplyButton} onPress={() => router.push(`/posts/reply?thread_id=${item.id}`)}>
-                    <ThemedText style={styles.addReplyButtonText}>+ Add Reply</ThemedText>
-                  </TouchableOpacity>
+              {/* Post Title */}
+              {item.title && <ThemedText style={styles.postTitle}>{item.title}</ThemedText>}
+
+              {/* Post Photo */}
+              {item.photo_url && getImageUrl(item.photo_url) && <Image source={{ uri: getImageUrl(item.photo_url)! }} style={styles.postPhoto} />}
+
+              {/* Post Content */}
+              <View style={styles.postContent}>
+                <ThemedText style={styles.postText}>{item.content}</ThemedText>
+              </View>
+
+              {/* Related Course */}
+              {item.course && (
+                <View style={styles.courseTag}>
+                  <ThemedText style={styles.courseTagText}>📚 Course: {item.course.title}</ThemedText>
                 </View>
               )}
 
-              {/* Reply Button if no replies yet */}
-              {(!item.replies || item.replies.length === 0) && (
-                <View style={styles.noRepliesHint}>
-                  <ThemedText style={styles.noRepliesText}>Be the first to reply</ThemedText>
-                </View>
-              )}
+              {/* Post Actions */}
+              <View style={styles.postActions}>
+                <TouchableOpacity style={styles.actionItem} onPress={() => router.push(`/users/${item.user?.id}`)}>
+                  <ThemedText style={styles.actionText}>👤 View</ThemedText>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.actionItem} onPress={() => router.push(`/chat?user_id=${item.user?.id}`)}>
+                  <ThemedText style={styles.actionText}>💬 Message</ThemedText>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.actionItem} onPress={() => router.push(`/posts/reply?thread_id=${item.id}`)}>
+                  <ThemedText style={styles.actionText}>🔗 Reply</ThemedText>
+                </TouchableOpacity>
+              </View>
             </View>
-          )}
-        />
-      </ThemedView>
-    </ParallaxScrollView>
+
+            {/* Thread Replies */}
+            {item.replies && item.replies.length > 0 && (
+              <View style={styles.repliesContainer}>
+                <View style={styles.threadLine} />
+                {item.replies.map((reply: any) => (
+                  <View key={reply.id} style={styles.replyContainer}>
+                    <View style={styles.replyHeader}>
+                      <View style={styles.replyAvatar}>
+                        <ThemedText style={styles.replyAvatarText}>{reply.user?.name?.charAt(0) || "U"}</ThemedText>
+                      </View>
+                      <View style={styles.replyUserDetails}>
+                        <ThemedText style={styles.replyUserName}>{reply.user?.name}</ThemedText>
+                        <ThemedText style={styles.replyDate}>{new Date(reply.created_at).toLocaleDateString()}</ThemedText>
+                      </View>
+                      {currentUser?.id === reply.user_id && (
+                        <TouchableOpacity
+                          onPress={() => {
+                            posts.delete(reply.id);
+                            loadPosts();
+                          }}
+                        >
+                          <ThemedText style={styles.replyDeleteButton}>⋮</ThemedText>
+                        </TouchableOpacity>
+                      )}
+                    </View>
+                    {reply.photo_url && getImageUrl(reply.photo_url) && <Image source={{ uri: getImageUrl(reply.photo_url)! }} style={styles.replyPhoto} />}
+                    <View style={styles.replyContent}>
+                      <ThemedText style={styles.replyText}>{reply.content}</ThemedText>
+                    </View>
+                  </View>
+                ))}
+                {/* Add Reply Button in Thread */}
+                <TouchableOpacity style={styles.addReplyButton} onPress={() => router.push(`/posts/reply?thread_id=${item.id}`)}>
+                  <ThemedText style={styles.addReplyButtonText}>+ Add Reply</ThemedText>
+                </TouchableOpacity>
+              </View>
+            )}
+
+            {/* Reply Button if no replies yet */}
+            {(!item.replies || item.replies.length === 0) && (
+              <View style={styles.noRepliesHint}>
+                <ThemedText style={styles.noRepliesText}>Be the first to reply</ThemedText>
+              </View>
+            )}
+          </View>
+        )}
+      />
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
+    flex: 1,
     backgroundColor: "#f7fafc",
-    paddingBottom: 20,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
   },
   header: {
     flexDirection: "row",

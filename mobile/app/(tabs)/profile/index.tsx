@@ -1,11 +1,9 @@
 import React, { useCallback, useState } from "react";
-import { View, Text, StyleSheet, TouchableOpacity, Alert, Image } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity, Alert, Image, SafeAreaView, ScrollView } from "react-native";
 import { useRouter, useFocusEffect } from "expo-router";
 import { auth, API_BASE_URL } from "../../services/api";
 import { getToken, removeToken } from "../../services/auth";
-import ParallaxScrollView from "@/components/parallax-scroll-view";
 import { ThemedText } from "@/components/themed-text";
-import { ThemedView } from "@/components/themed-view";
 
 export default function ProfileScreen() {
   const [user, setUser] = useState<any>(null);
@@ -50,27 +48,27 @@ export default function ProfileScreen() {
 
   if (loading) {
     return (
-      <ParallaxScrollView headerBackgroundColor={{ light: "#A1CEDC", dark: "#1D3D47" }} headerImage={<View />}>
-        <ThemedView style={styles.container}>
+      <SafeAreaView style={styles.container}>
+        <View style={styles.loadingContainer}>
           <ThemedText>Loading...</ThemedText>
-        </ThemedView>
-      </ParallaxScrollView>
+        </View>
+      </SafeAreaView>
     );
   }
 
   if (!user) {
     return (
-      <ParallaxScrollView headerBackgroundColor={{ light: "#A1CEDC", dark: "#1D3D47" }} headerImage={<View />}>
-        <ThemedView style={styles.container}>
+      <SafeAreaView style={styles.container}>
+        <View style={styles.loadingContainer}>
           <ThemedText>No user found</ThemedText>
-        </ThemedView>
-      </ParallaxScrollView>
+        </View>
+      </SafeAreaView>
     );
   }
 
   return (
-    <ParallaxScrollView headerBackgroundColor={{ light: "#A1CEDC", dark: "#1D3D47" }} headerImage={<View />}>
-      <ThemedView style={styles.container}>
+    <SafeAreaView style={styles.container}>
+      <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
         <View style={styles.headerCard}>
           {user.avatar_path ? (
             <Image source={{ uri: API_BASE_URL.replace(/\/api$/, "") + "/" + user.avatar_path }} style={styles.avatarImage} />
@@ -84,14 +82,14 @@ export default function ProfileScreen() {
         </View>
 
         {user.bio && (
-          <ThemedView style={styles.section}>
+          <View style={styles.section}>
             <ThemedText type="subtitle">About</ThemedText>
             <ThemedText style={styles.bio}>{user.bio}</ThemedText>
-          </ThemedView>
+          </View>
         )}
 
         {user.specialties?.length > 0 && (
-          <ThemedView style={styles.section}>
+          <View style={styles.section}>
             <ThemedText type="subtitle">Specialties</ThemedText>
             <View style={styles.chipContainer}>
               {user.specialties.map((s: any) => (
@@ -100,11 +98,11 @@ export default function ProfileScreen() {
                 </View>
               ))}
             </View>
-          </ThemedView>
+          </View>
         )}
 
         {user.skills?.length > 0 && (
-          <ThemedView style={styles.section}>
+          <View style={styles.section}>
             <ThemedText type="subtitle">Skills ({user.skills.length})</ThemedText>
             <View style={styles.listContainer}>
               {user.skills.slice(0, 5).map((s: any) => (
@@ -114,11 +112,11 @@ export default function ProfileScreen() {
                 </View>
               ))}
             </View>
-          </ThemedView>
+          </View>
         )}
 
         {user.courses?.length > 0 && (
-          <ThemedView style={styles.section}>
+          <View style={styles.section}>
             <ThemedText type="subtitle">Courses ({user.courses.length})</ThemedText>
             <View style={styles.listContainer}>
               {user.courses.slice(0, 5).map((c: any) => (
@@ -127,11 +125,11 @@ export default function ProfileScreen() {
                 </View>
               ))}
             </View>
-          </ThemedView>
+          </View>
         )}
 
         {user.posts?.length > 0 && (
-          <ThemedView style={styles.section}>
+          <View style={styles.section}>
             <ThemedText type="subtitle">Posts ({user.posts.length})</ThemedText>
             <View style={styles.listContainer}>
               {user.posts.slice(0, 3).map((p: any) => (
@@ -143,22 +141,10 @@ export default function ProfileScreen() {
                 </TouchableOpacity>
               ))}
             </View>
-          </ThemedView>
+          </View>
         )}
 
-        <ThemedView style={styles.section}>
-          <ThemedText type="subtitle">Profile Settings</ThemedText>
-          <View style={styles.settingsList}>
-            <TouchableOpacity style={styles.settingsItem} onPress={() => router.push("/(tabs)/settings/edit-profile")}>
-              <ThemedText>✏️ Edit Profile</ThemedText>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.settingsItem} onPress={() => router.push("/(tabs)/settings/upload-picture")}>
-              <ThemedText>📷 Change Profile Picture</ThemedText>
-            </TouchableOpacity>
-          </View>
-        </ThemedView>
-
-        <ThemedView style={styles.section}>
+        <View style={styles.section}>
           <ThemedText type="subtitle">Quick Actions</ThemedText>
           <View style={styles.settingsList}>
             <TouchableOpacity style={styles.settingsItem} onPress={() => router.push("/posts/create")}>
@@ -171,19 +157,41 @@ export default function ProfileScreen() {
               <ThemedText style={styles.logoutText}>🚪 Logout</ThemedText>
             </TouchableOpacity>
           </View>
-        </ThemedView>
+        </View>
+
+        <View style={styles.section}>
+          <ThemedText type="subtitle">Profile Settings</ThemedText>
+          <View style={styles.settingsList}>
+            <TouchableOpacity style={styles.settingsItem} onPress={() => router.push("/(tabs)/profile/edit-profile")}>
+              <ThemedText>✏️ Edit Profile</ThemedText>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.settingsItem} onPress={() => router.push("/(tabs)/profile/upload-picture")}>
+              <ThemedText>📷 Change Profile Picture</ThemedText>
+            </TouchableOpacity>
+          </View>
+        </View>
 
         <View style={styles.footer}>
           <ThemedText style={styles.footerText}>BisaBelajar v1.0.0</ThemedText>
         </View>
-      </ThemedView>
-    </ParallaxScrollView>
+      </ScrollView>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { padding: 16, backgroundColor: "#f7fafc" },
+  container: { flex: 1, backgroundColor: "#f7fafc" },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  scrollView: {
+    flex: 1,
+  },
   headerCard: {
+    marginTop: 16,
+    marginHorizontal: 16,
     alignItems: "center",
     marginBottom: 24,
     paddingVertical: 16,
@@ -228,6 +236,7 @@ const styles = StyleSheet.create({
     padding: 16,
     borderRadius: 12,
     marginBottom: 12,
+    marginHorizontal: 16,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.05,

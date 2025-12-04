@@ -90,6 +90,15 @@ class DatabaseSeeder extends Seeder
         $course5 = Course::factory()->create(['owner_id' => $emma->id, 'title' => 'Yoga Basics', 'description' => 'Start your yoga journey']);
         $course5->students()->attach([$alice->id, $frank->id]);
 
+        $course6 = Course::factory()->create(['owner_id' => $frank->id, 'title' => 'Portrait Photography Mastery', 'description' => 'Advanced portrait photography techniques']);
+        $course6->students()->attach([$grace->id, $henry->id]);
+
+        $course7 = Course::factory()->create(['owner_id' => $grace->id, 'title' => 'UX/UI Design Principles', 'description' => 'Create beautiful and intuitive user interfaces']);
+        $course7->students()->attach([$bob->id, $david->id]);
+
+        $course8 = Course::factory()->create(['owner_id' => $henry->id, 'title' => 'Startup Growth Strategies', 'description' => 'Scale your startup from zero to hero']);
+        $course8->students()->attach([$alice->id, $carol->id]);
+
         // Swaps - More interactions
         Swap::factory()->create([
             'requester_id' => $alice->id,
@@ -115,12 +124,18 @@ class DatabaseSeeder extends Seeder
             'status' => 'accepted',
         ]);
 
-        // Messages - More interactions
+        // Messages - More interactions including self-chat
         Message::factory()->create(['sender_id' => $alice->id, 'receiver_id' => $bob->id, 'content' => 'Hi Bob! Interested in swapping skills?']);
         Message::factory()->create(['sender_id' => $bob->id, 'receiver_id' => $alice->id, 'content' => 'Sure! I\'d love to learn guitar from you.']);
         Message::factory()->create(['sender_id' => $carol->id, 'receiver_id' => $emma->id, 'content' => 'Your yoga classes sound amazing! Can we collaborate?']);
         Message::factory()->create(['sender_id' => $david->id, 'receiver_id' => $grace->id, 'content' => 'Great portfolio! Let\'s discuss a project.']);
         Message::factory()->create(['sender_id' => $frank->id, 'receiver_id' => $henry->id, 'content' => 'I\'m interested in business coaching. When are you available?']);
+
+        // Self-chat messages (notes to self)
+        Message::factory()->create(['sender_id' => $alice->id, 'receiver_id' => $alice->id, 'content' => 'Remember to prepare guitar lesson for tomorrow!']);
+        Message::factory()->create(['sender_id' => $alice->id, 'receiver_id' => $alice->id, 'content' => 'Buy new guitar strings and picks this weekend.']);
+        Message::factory()->create(['sender_id' => $bob->id, 'receiver_id' => $bob->id, 'content' => 'Code review notes: refactor authentication module']);
+        Message::factory()->create(['sender_id' => $david->id, 'receiver_id' => $david->id, 'content' => 'ML model ideas: try ensemble methods for better accuracy']);
 
         // Meetings
         Meeting::factory()->create(['host_id' => $alice->id, 'guest_id' => $bob->id, 'scheduled_at' => now()->addDays(3), 'platform' => 'jitsi']);
@@ -635,6 +650,14 @@ Who\'s working on their startup idea right now? 💪',
             'Business' => $business = \App\Models\Specialty::firstOrCreate(['name' => 'Business']),
             'Teaching' => $teaching = \App\Models\Specialty::firstOrCreate(['name' => 'Teaching']),
             'Wellness' => $wellness = \App\Models\Specialty::firstOrCreate(['name' => 'Wellness']),
+            'Music' => $music = \App\Models\Specialty::firstOrCreate(['name' => 'Music']),
+            'Art' => $art = \App\Models\Specialty::firstOrCreate(['name' => 'Art']),
+            'Language' => $language = \App\Models\Specialty::firstOrCreate(['name' => 'Language']),
+            'Fitness' => $fitness = \App\Models\Specialty::firstOrCreate(['name' => 'Fitness']),
+            'Marketing' => $marketing = \App\Models\Specialty::firstOrCreate(['name' => 'Marketing']),
+            'Writing' => $writing = \App\Models\Specialty::firstOrCreate(['name' => 'Writing']),
+            'Video Production' => $video = \App\Models\Specialty::firstOrCreate(['name' => 'Video Production']),
+            'Data Science' => $datascience = \App\Models\Specialty::firstOrCreate(['name' => 'Data Science']),
         ];
 
         // Attach specialties to users
