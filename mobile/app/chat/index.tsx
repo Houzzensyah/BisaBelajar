@@ -2,7 +2,6 @@ import React, { useEffect, useState, useRef, useCallback } from "react";
 import { SafeAreaView, View, FlatList, StyleSheet, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform, Image, Text, Alert, Dimensions } from "react-native";
 import { messages, auth, usersApi, API_BASE_URL, callsApi } from "../services/api";
 import { useRouter, useLocalSearchParams, useFocusEffect } from "expo-router";
-import { ThemedText } from "@/components/themed-text";
 
 export default function ChatScreen() {
   const [items, setItems] = useState<any[]>([]);
@@ -132,15 +131,13 @@ export default function ChatScreen() {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.header}>
-          <TouchableOpacity onPress={() => router.back()}>
-            <ThemedText style={styles.backButton}>← Back</ThemedText>
+          <TouchableOpacity onPress={() => router.back()} style={styles.backButtonContainer}>
+            <Text style={styles.backButton}>←</Text>
           </TouchableOpacity>
-          <ThemedText type="title" style={styles.headerTitle}>
-            Messages
-          </ThemedText>
+          <Text style={styles.headerTitle}>Messages</Text>
         </View>
         <View style={styles.loadingContainer}>
-          <ThemedText>Loading...</ThemedText>
+          <Text style={styles.loadingText}>Loading...</Text>
         </View>
       </SafeAreaView>
     );
@@ -148,21 +145,19 @@ export default function ChatScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.back()}>
-          <ThemedText style={styles.backButton}>← Back</ThemedText>
+        <TouchableOpacity onPress={() => router.back()} style={styles.backButtonContainer}>
+          <Text style={styles.backButton}>←</Text>
         </TouchableOpacity>
         <View style={styles.headerInfo}>
           {otherUser && (
             <>
-              <ThemedText type="subtitle" style={styles.headerName}>
-                {otherUser.name}
-              </ThemedText>
-              <ThemedText style={styles.headerSubtitle}>Active now</ThemedText>
+              <Text style={styles.headerName}>{otherUser.name}</Text>
+              <Text style={styles.headerSubtitle}>Active now</Text>
             </>
           )}
         </View>
         <TouchableOpacity style={styles.callButton} onPress={handleCall} disabled={callLoading}>
-          <ThemedText style={styles.callButtonText}>📞</ThemedText>
+          <Text style={styles.callButtonText}>📞</Text>
         </TouchableOpacity>
       </View>
 
@@ -209,7 +204,7 @@ export default function ChatScreen() {
                       <Image source={{ uri: API_BASE_URL.replace(/\/api$/, "") + "/" + item.sender.avatar_path }} style={styles.otherUserAvatarImage} />
                     ) : (
                       <View style={styles.otherUserAvatar}>
-                        <ThemedText style={styles.avatarText}>{item.sender?.name?.charAt(0) || "U"}</ThemedText>
+                        <Text style={styles.avatarText}>{item.sender?.name?.charAt(0) || "U"}</Text>
                       </View>
                     ))}
                   <View style={[styles.messageContent, { maxWidth: BUBBLE_MAX_WIDTH - 20 }]}>
@@ -227,7 +222,7 @@ export default function ChatScreen() {
                   <Image source={{ uri: API_BASE_URL.replace(/\/api$/, "") + "/" + currentUser.avatar_path }} style={styles.currentUserAvatarImage} />
                 ) : (
                   <View style={styles.currentUserAvatar}>
-                    <ThemedText style={styles.avatarText}>{currentUser?.name?.charAt(0) || "U"}</ThemedText>
+                    <Text style={styles.avatarText}>{currentUser?.name?.charAt(0) || "U"}</Text>
                   </View>
                 ))}
             </View>
@@ -245,13 +240,13 @@ export default function ChatScreen() {
           <View style={styles.inputWrapper}>
             <TextInput value={message} onChangeText={setMessage} placeholder="Message..." placeholderTextColor="#999" style={styles.input} multiline={true} maxLength={500} editable={true} scrollEnabled={true} />
             <TouchableOpacity style={styles.sendButton} onPress={handleSend} disabled={!message.trim()}>
-              <ThemedText style={styles.sendButtonText}>Send</ThemedText>
+              <Text style={styles.sendButtonText}>Send</Text>
             </TouchableOpacity>
           </View>
         </KeyboardAvoidingView>
       ) : (
         <View style={styles.noUserContainer}>
-          <ThemedText style={styles.noUserText}>Select a user to message</ThemedText>
+          <Text style={styles.noUserText}>Select a user to message</Text>
         </View>
       )}
     </SafeAreaView>
@@ -261,22 +256,33 @@ export default function ChatScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#f7fafc",
+    backgroundColor: "#f5f7fa",
   },
   header: {
     flexDirection: "row",
     alignItems: "center",
     paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingVertical: 14,
     backgroundColor: "#fff",
-    borderBottomWidth: 1,
-    borderBottomColor: "#e5e7eb",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 3,
+    elevation: 3,
     gap: 12,
   },
+  backButtonContainer: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: "#f3f4f6",
+    alignItems: "center",
+    justifyContent: "center",
+  },
   backButton: {
-    fontSize: 16,
-    color: "#0ea5a3",
-    fontWeight: "600",
+    fontSize: 22,
+    color: "#0ea5e9",
+    fontWeight: "700",
   },
   headerInfo: {
     flex: 1,
@@ -286,32 +292,41 @@ const styles = StyleSheet.create({
     fontWeight: "700",
   },
   headerName: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#1f2937",
+    fontSize: 18,
+    fontWeight: "700",
+    color: "#111827",
+    letterSpacing: -0.3,
   },
   headerSubtitle: {
     fontSize: 12,
-    color: "#999",
+    color: "#10b981",
     marginTop: 2,
+    fontWeight: "600",
   },
   callButton: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: "#0ea5a3",
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: "#0ea5e9",
     alignItems: "center",
     justifyContent: "center",
+    shadowColor: "#0ea5e9",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 4,
   },
   callButtonText: {
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "600",
+    fontSize: 18,
   },
   loadingContainer: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
+  },
+  loadingText: {
+    fontSize: 15,
+    color: "#6b7280",
   },
   listContent: {
     paddingHorizontal: 0,
@@ -346,33 +361,37 @@ const styles = StyleSheet.create({
     flexShrink: 1,
   },
   messageBubbleCurrentUser: {
-    backgroundColor: "#0ea5a3",
-    borderRadius: 16,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    elevation: 1,
+    backgroundColor: "#0ea5e9",
+    borderRadius: 18,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    shadowColor: "#0ea5e9",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 3,
     marginRight: 0,
     marginLeft: 0,
   },
   messageBubbleOtherUser: {
-    backgroundColor: "#e8eaed",
-    borderRadius: 16,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
+    backgroundColor: "#ffffff",
+    borderRadius: 18,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    elevation: 1,
+    shadowOpacity: 0.08,
+    shadowRadius: 3,
+    elevation: 2,
     marginLeft: 0,
+    borderWidth: 1,
+    borderColor: "#e5e7eb",
   },
   otherUserAvatar: {
     width: 28,
     height: 28,
     borderRadius: 14,
-    backgroundColor: "#e0f2f1",
+    backgroundColor: "#dbeafe",
     alignItems: "center",
     justifyContent: "center",
   },
@@ -386,7 +405,7 @@ const styles = StyleSheet.create({
     width: 28,
     height: 28,
     borderRadius: 14,
-    backgroundColor: "#0ca597",
+    backgroundColor: "#0284c7",
     alignItems: "center",
     justifyContent: "center",
   },
@@ -408,10 +427,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 4,
   },
   messageText: {
-    fontSize: 14,
-    lineHeight: 20,
+    fontSize: 15,
+    lineHeight: 21,
     flexWrap: "wrap",
-    // ensure the text doesn't shrink unexpectedly; let the container grow up to maxWidth
     flexShrink: 0,
   },
   messageTextCurrentUser: {
@@ -419,7 +437,8 @@ const styles = StyleSheet.create({
     fontWeight: "500",
   },
   messageTextOtherUser: {
-    color: "#1f2937",
+    color: "#111827",
+    fontWeight: "500",
   },
   messageTime: {
     fontSize: 11,
@@ -433,40 +452,49 @@ const styles = StyleSheet.create({
     color: "#999",
   },
   inputContainer: {
-    paddingHorizontal: 12,
-    paddingVertical: 12,
+    paddingHorizontal: 14,
+    paddingVertical: 14,
     backgroundColor: "#fff",
-    borderTopWidth: 1,
-    borderTopColor: "#e5e7eb",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: -2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 3,
+    elevation: 5,
   },
   inputWrapper: {
     flexDirection: "row",
     alignItems: "flex-end",
-    gap: 8,
+    gap: 10,
   },
   input: {
     flex: 1,
     borderWidth: 1,
     borderColor: "#e5e7eb",
-    borderRadius: 20,
-    paddingHorizontal: 16,
-    paddingVertical: 10,
+    borderRadius: 22,
+    paddingHorizontal: 18,
+    paddingVertical: 11,
     backgroundColor: "#f9fafb",
-    fontSize: 14,
+    fontSize: 15,
     maxHeight: 100,
+    color: "#111827",
   },
   sendButton: {
-    backgroundColor: "#0ea5a3",
-    borderRadius: 20,
-    paddingHorizontal: 16,
-    paddingVertical: 10,
+    backgroundColor: "#0ea5e9",
+    borderRadius: 22,
+    paddingHorizontal: 20,
+    paddingVertical: 11,
     alignItems: "center",
     justifyContent: "center",
+    shadowColor: "#0ea5e9",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 4,
   },
   sendButtonText: {
     color: "#fff",
-    fontWeight: "600",
-    fontSize: 13,
+    fontWeight: "700",
+    fontSize: 14,
   },
   noUserContainer: {
     alignItems: "center",

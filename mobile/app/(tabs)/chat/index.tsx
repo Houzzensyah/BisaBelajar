@@ -2,7 +2,6 @@ import React, { useEffect, useState, useCallback } from "react";
 import { SafeAreaView, View, FlatList, StyleSheet, TouchableOpacity, Image, Text, RefreshControl } from "react-native";
 import { usersApi, messages, auth, API_BASE_URL } from "../../services/api";
 import { useRouter, useFocusEffect } from "expo-router";
-import { ThemedText } from "@/components/themed-text";
 
 export default function ChatListScreen() {
   const [conversations, setConversations] = useState<any[]>([]);
@@ -92,12 +91,10 @@ export default function ChatListScreen() {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.header}>
-          <ThemedText type="title" style={styles.headerTitle}>
-            Messages
-          </ThemedText>
+          <Text style={styles.headerTitle}>Messages</Text>
         </View>
         <View style={styles.loadingContainer}>
-          <ThemedText>Loading...</ThemedText>
+          <Text>Loading...</Text>
         </View>
       </SafeAreaView>
     );
@@ -106,9 +103,7 @@ export default function ChatListScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <ThemedText type="title" style={styles.headerTitle}>
-          Messages
-        </ThemedText>
+        <Text style={styles.headerTitle}>Messages</Text>
         <TouchableOpacity style={styles.selfChatButton} onPress={handleStartSelfChat}>
           <Text style={styles.selfChatIcon}>📝</Text>
         </TouchableOpacity>
@@ -117,10 +112,10 @@ export default function ChatListScreen() {
       {conversations.length === 0 ? (
         <View style={styles.emptyContainer}>
           <Text style={styles.emptyIcon}>💬</Text>
-          <ThemedText style={styles.emptyText}>No messages yet</ThemedText>
-          <ThemedText style={styles.emptySubtext}>Start a conversation with someone!</ThemedText>
+          <Text style={styles.emptyText}>No messages yet</Text>
+          <Text style={styles.emptySubtext}>Start a conversation with someone!</Text>
           <TouchableOpacity style={styles.selfChatPrompt} onPress={handleStartSelfChat}>
-            <ThemedText style={styles.selfChatPromptText}>Or create notes to yourself</ThemedText>
+            <Text style={styles.selfChatPromptText}>Or create notes to yourself</Text>
           </TouchableOpacity>
         </View>
       ) : (
@@ -138,19 +133,19 @@ export default function ChatListScreen() {
                   <Image source={{ uri: API_BASE_URL.replace(/\/api$/, "") + "/" + item.partner.avatar_path }} style={styles.avatar} />
                 ) : (
                   <View style={[styles.avatar, item.isSelf ? styles.selfAvatar : styles.defaultAvatar]}>
-                    <ThemedText style={styles.avatarText}>{item.isSelf ? "📝" : item.partner?.name?.charAt(0) || "U"}</ThemedText>
+                    <Text style={styles.avatarText}>{item.isSelf ? "📝" : item.partner?.name?.charAt(0) || "U"}</Text>
                   </View>
                 )}
 
                 <View style={styles.conversationInfo}>
                   <View style={styles.conversationHeader}>
-                    <ThemedText style={styles.partnerName}>{displayName}</ThemedText>
-                    <ThemedText style={styles.timestamp}>{new Date(item.created_at).toLocaleDateString([], { month: "short", day: "numeric" })}</ThemedText>
+                    <Text style={styles.partnerName}>{displayName}</Text>
+                    <Text style={styles.timestamp}>{new Date(item.created_at).toLocaleDateString([], { month: "short", day: "numeric" })}</Text>
                   </View>
-                  <ThemedText style={styles.messagePreview} numberOfLines={1}>
+                  <Text style={styles.messagePreview} numberOfLines={1}>
                     {isSender && !item.isSelf ? "You: " : ""}
                     {preview}
-                  </ThemedText>
+                  </Text>
                 </View>
               </TouchableOpacity>
             );
@@ -165,29 +160,40 @@ export default function ChatListScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#f7fafc",
+    backgroundColor: "#f5f7fa",
   },
   header: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    paddingHorizontal: 16,
-    paddingVertical: 16,
+    paddingHorizontal: 20,
+    paddingTop: 16,
+    paddingBottom: 12,
     backgroundColor: "#fff",
-    borderBottomWidth: 1,
-    borderBottomColor: "#e5e7eb",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 3,
+    elevation: 3,
   },
   headerTitle: {
-    fontSize: 24,
+    fontSize: 28,
     fontWeight: "700",
+    color: "#111827",
+    letterSpacing: -0.5,
   },
   selfChatButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: "#0ea5a3",
+    width: 42,
+    height: 42,
+    borderRadius: 21,
+    backgroundColor: "#0ea5e9",
     alignItems: "center",
     justifyContent: "center",
+    shadowColor: "#0ea5e9",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 4,
   },
   selfChatIcon: {
     fontSize: 20,
@@ -201,60 +207,80 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    paddingHorizontal: 32,
+    paddingHorizontal: 40,
   },
   emptyIcon: {
-    fontSize: 64,
-    marginBottom: 16,
+    fontSize: 72,
+    marginBottom: 20,
+    opacity: 0.8,
   },
   emptyText: {
-    fontSize: 18,
-    fontWeight: "600",
+    fontSize: 20,
+    fontWeight: "700",
     marginBottom: 8,
     textAlign: "center",
+    color: "#111827",
   },
   emptySubtext: {
-    fontSize: 14,
-    color: "#999",
+    fontSize: 15,
+    color: "#6b7280",
     textAlign: "center",
-    marginBottom: 16,
+    marginBottom: 24,
+    lineHeight: 22,
   },
   selfChatPrompt: {
-    paddingVertical: 12,
-    paddingHorizontal: 24,
-    backgroundColor: "#0ea5a3",
-    borderRadius: 20,
+    paddingVertical: 14,
+    paddingHorizontal: 28,
+    backgroundColor: "#0ea5e9",
+    borderRadius: 24,
     marginTop: 8,
+    shadowColor: "#0ea5e9",
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.3,
+    shadowRadius: 5,
+    elevation: 5,
   },
   selfChatPromptText: {
     color: "#fff",
-    fontWeight: "600",
+    fontWeight: "700",
+    fontSize: 15,
   },
   conversationItem: {
     flexDirection: "row",
     alignItems: "center",
     paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingVertical: 14,
     backgroundColor: "#fff",
-    borderBottomWidth: 1,
-    borderBottomColor: "#f0f0f0",
+    marginHorizontal: 12,
+    marginVertical: 4,
+    borderRadius: 12,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.08,
+    shadowRadius: 3,
+    elevation: 2,
   },
   avatar: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    marginRight: 12,
+    width: 54,
+    height: 54,
+    borderRadius: 27,
+    marginRight: 14,
     alignItems: "center",
     justifyContent: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 2,
   },
   defaultAvatar: {
-    backgroundColor: "#e0f2f1",
+    backgroundColor: "#dbeafe",
   },
   selfAvatar: {
-    backgroundColor: "#fff3cd",
+    backgroundColor: "#fef3c7",
   },
   avatarText: {
-    fontSize: 20,
+    fontSize: 22,
     fontWeight: "700",
   },
   conversationInfo: {
@@ -267,16 +293,19 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   partnerName: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#1f2937",
+    fontSize: 17,
+    fontWeight: "700",
+    color: "#111827",
+    letterSpacing: -0.3,
   },
   timestamp: {
     fontSize: 12,
-    color: "#999",
+    color: "#9ca3af",
+    fontWeight: "500",
   },
   messagePreview: {
     fontSize: 14,
-    color: "#666",
+    color: "#6b7280",
+    lineHeight: 20,
   },
 });
