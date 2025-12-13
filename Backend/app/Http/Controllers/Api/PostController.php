@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Post;
+use App\Models\Course;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -21,7 +22,9 @@ class PostController extends Controller
         }
 
         // Eager load user, course, and thread replies
-        $posts = $query->with(['user', 'course', 'replies' => function ($q) {
+        $posts = $query->with(['user' => function ($q) {
+            $q->with('skills');
+        }, 'course', 'replies' => function ($q) {
             $q->with('user')->latest();
         }])->latest()->paginate(20);
 
@@ -33,33 +36,40 @@ class PostController extends Controller
         $data = $request->validate([
             'title' => 'nullable|string|max:255',
             'content' => 'required|string',
-            'video_url' => 'nullable|url',
-            'photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:5120',
-            'course_id' => 'nullable|exists:courses,id',
-            'thread_id' => 'nullable|exists:posts,id',
+            'course_id' => 'nullable|string',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:5120',
         ]);
+
+        // Parse course_id if provided
+        $courseId = null;
+        if (isset($data['course_id']) && !empty($data['course_id'])) {
+            $courseId = $this->parseCourseId($data['course_id']);
+            // Validate that course exists
+            $course = Course::find($courseId);
+            if (!$course) {
+                return response()->json(['message' => 'Course not found'], 400);
+            }
+        }
 
         $postData = [
             'title' => $data['title'] ?? null,
             'content' => $data['content'],
-            'video_url' => $data['video_url'] ?? null,
             'user_id' => Auth::id(),
-            'course_id' => $data['course_id'] ?? null,
-            'thread_id' => $data['thread_id'] ?? null,
+            'course_id' => $courseId,
         ];
 
-        // Handle photo upload
-        if ($request->hasFile('photo')) {
+        // Handle image upload (frontend sends as 'image')
+        if ($request->hasFile('image')) {
             try {
-                $file = $request->file('photo');
+                $file = $request->file('image');
                 $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
                 $path = $file->storeAs('posts', $filename, 'public');
                 if ($path) {
-                    // Return just the path for storage URL construction
-                    $postData['photo_url'] = 'storage/' . $path;
+                    // Store the full URL path
+                    $postData['photo_url'] = config('app.url') . '/storage/' . $path;
                 }
             } catch (\Exception $e) {
-                return response()->json(['message' => 'Failed to upload photo: ' . $e->getMessage()], 422);
+                return response()->json(['message' => 'Failed to upload image: ' . $e->getMessage()], 422);
             }
         }
 
@@ -82,5 +92,24 @@ class PostController extends Controller
 
         $post->delete();
         return response()->json(['message' => 'Deleted']);
+    }
+
+    /**
+     * Parse course ID that can be either integer or string format
+     */
+    private function parseCourseId($courseId)
+    {
+        // If it's already an integer, return as is
+        if (is_int($courseId) || ctype_digit($courseId)) {
+            return (int) $courseId;
+        }
+
+        // If it's a string like "course_002", extract the number
+        if (preg_match('/course_(\d+)/', $courseId, $matches)) {
+            return (int) $matches[1];
+        }
+
+        // If it's just a string number, convert to int
+        return (int) $courseId;
     }
 }

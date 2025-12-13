@@ -16,6 +16,7 @@ class CourseFactory extends Factory
             'owner_id' => User::factory(),
             'title' => $this->faker->sentence(3),
             'description' => $this->faker->paragraph(),
+            'image_url' => $this->faker->imageUrl(640, 480, 'course', true, 'Course'),
         ];
     }
 }

@@ -21,8 +21,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/me', [AuthController::class, 'me']);
     Route::put('/me', [AuthController::class, 'updateProfile']);
     Route::post('/me/avatar', [AuthController::class, 'uploadProfilePicture']);
+    Route::get('/me/courses', [CourseController::class, 'enrolled']);
     Route::apiResource('skills', SkillController::class);
     Route::get('swaps', [SwapController::class, 'index']);
+    Route::get('swaps/{swap}', [SwapController::class, 'show']);
     Route::post('swaps', [SwapController::class, 'store']);
     Route::post('swaps/{swap}/accept', [SwapController::class, 'accept']);
     Route::post('swaps/{swap}/reject', [SwapController::class, 'reject']);
@@ -30,6 +32,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('courses', CourseController::class)->only(['index', 'store', 'show']);
     Route::post('courses/{course}/enroll', [CourseController::class, 'enroll']);
 
+    Route::get('chats', [ChatController::class, 'chats']);
+    Route::get('chats/{user}', [ChatController::class, 'conversation']);
     Route::get('messages', [ChatController::class, 'index']);
     Route::post('messages', [ChatController::class, 'send']);
     Route::delete('messages/{message}', [ChatController::class, 'destroy']);
@@ -42,7 +46,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('calls/{call}/decline', [CallController::class, 'decline']);
     Route::post('calls/{call}/end', [CallController::class, 'end']);
     Route::apiResource('posts', PostController::class)->only(['index', 'store', 'show', 'destroy']);
-    Route::get('users/{user}', [UserController::class, 'show']);
+    Route::apiResource('users', UserController::class)->only(['index', 'show']);
     Route::get('search', [SearchController::class, 'search']);
 });
 

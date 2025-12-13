@@ -1,0 +1,388 @@
+{
+  "post_creation_api": {
+    "endpoint": "POST /api/posts",
+    "description": "Create a new post with optional image upload and course association",
+    "authentication": "Required (Bearer token)",
+    "content_type": "multipart/form-data (for image uploads)",
+
+    "frontend_request_format": {
+      "description": "Exact format the frontend should send",
+      "form_data": {
+        "title": "Getting Started with React Hooks",
+        "content": "I've been learning React Hooks lately and wanted to share my experience...",
+        "course_id": "course_002",
+        "image": "File object (optional)"
+      },
+      "notes": [
+        "title is optional but recommended",
+        "content is required",
+        "course_id is optional, use 'course_XXX' format where XXX is course ID",
+        "image is optional, should be a File object for multipart upload",
+        "All data sent as FormData for file uploads"
+      ]
+    },
+
+    "successful_response": {
+      "status": 201,
+      "body": {
+        "id": 15,
+        "title": "Getting Started with React Hooks",
+        "content": "I've been learning React Hooks lately...",
+        "photo_url": "storage/posts/1733434567_6789abcdef.jpg",
+        "course_id": 2,
+        "user_id": 1,
+        "thread_id": null,
+        "created_at": "2024-12-12T10:30:00Z",
+        "updated_at": "2024-12-12T10:30:00Z",
+        "user": {
+          "id": 1,
+          "name": "Alice",
+          "avatar_path": "/avatars/alice.jpg",
+          "score": 4.8
+        },
+        "course": {
+          "id": 2,
+          "title": "JavaScript Fundamentals",
+          "image_url": "https://images.unsplash.com/photo-1579468118864-1b9ea3c0db4a?w=640&h=480&fit=crop"
+        }
+      }
+    },
+
+    "validation_rules": {
+      "title": "optional|string|max:255",
+      "content": "required|string",
+      "course_id": "optional|string (format: 'course_XXX' where XXX is integer)",
+      "image": "optional|image|mimes:jpeg,png,jpg,gif|max:5120 (5MB limit)",
+      "business_rules": [
+        "Course must exist if course_id is provided",
+        "Image files are stored in storage/app/public/posts/",
+        "User must be authenticated"
+      ]
+    },
+
+    "error_responses": {
+      "validation_error": {
+        "status": 422,
+        "body": {
+          "message": "The given data was invalid.",
+          "errors": {
+            "content": ["The content field is required."],
+            "image": ["The image must be a file of type: jpeg, png, jpg, gif."]
+          }
+        }
+      },
+      "course_not_found": {
+        "status": 400,
+        "body": {
+          "message": "Course not found"
+        }
+      },
+      "upload_failed": {
+        "status": 422,
+        "body": {
+          "message": "Failed to upload image: [error details]"
+        }
+      }
+    },
+
+    "examples": {
+      "post_with_course_and_image": {
+        "description": "Create a post linked to a course with an image",
+        "form_data": {
+          "title": "React Hooks Tutorial",
+          "content": "Here's how to use useState and useEffect...",
+          "course_id": "course_002",
+          "image": "File object (tutorial-screenshot.jpg)"
+        }
+      },
+      "simple_text_post": {
+        "description": "Create a simple text post without course or image",
+        "form_data": {
+          "content": "Just sharing my learning experience today!",
+          "title": "Learning Update"
+        }
+      },
+      "course_discussion": {
+        "description": "Create a post in a course discussion",
+        "form_data": {
+          "title": "Question about Assignment",
+          "content": "I'm stuck on the useEffect cleanup function...",
+          "course_id": "course_002"
+        }
+      }
+    }
+  },
+
+  "other_post_endpoints": {
+    "get_posts": {
+      "method": "GET",
+      "endpoint": "/api/posts",
+      "query_params": {
+        "user_id": "optional - filter posts by specific user",
+        "page": "optional - pagination page",
+        "per_page": "optional - items per page (default: 20)"
+      },
+      "response": {
+        "data": [
+          {
+            "id": 15,
+            "title": "Getting Started with React Hooks",
+            "content": "I've been learning React Hooks...",
+            "photo_url": "storage/posts/1733434567_6789abcdef.jpg",
+            "course_id": 2,
+            "user": { "id": 1, "name": "Alice" },
+            "course": { "id": 2, "title": "JavaScript Fundamentals" },
+            "replies_count": 0,
+            "created_at": "2024-12-12T10:30:00Z"
+          }
+        ],
+        "meta": { "pagination info..." }
+      }
+    },
+
+    "get_single_post": {
+      "method": "GET",
+      "endpoint": "/api/posts/{post_id}",
+      "response": {
+        "id": 15,
+        "title": "Getting Started with React Hooks",
+        "content": "Full post content...",
+        "photo_url": "storage/posts/1733434567_6789abcdef.jpg",
+        "user": { "full user object" },
+        "course": { "full course object" },
+        "replies": [
+          {
+            "id": 16,
+            "content": "Great explanation!",
+            "user": { "id": 2, "name": "Bob" },
+            "created_at": "2024-12-12T11:00:00Z"
+          }
+        ],
+        "created_at": "2024-12-12T10:30:00Z"
+      }
+    },
+
+    "delete_post": {
+      "method": "DELETE",
+      "endpoint": "/api/posts/{post_id}",
+      "authorization": "Only post author can delete",
+      "response": {
+        "message": "Deleted"
+      }
+    }
+  },
+
+  "file_upload_details": {
+    "storage_location": "storage/app/public/posts/",
+    "url_access": "/storage/posts/filename.jpg",
+    "file_naming": "timestamp_random.extension",
+    "supported_formats": ["jpeg", "png", "jpg", "gif"],
+    "max_file_size": "5MB",
+    "laravel_storage_setup": {
+      "disk": "public",
+      "directory": "posts/",
+      "symlink": "Run: php artisan storage:link (creates public/storage symlink)"
+    }
+  },
+
+  "frontend_integration": {
+    "creating_post_with_image": `
+// Frontend function to create a post with image upload
+const createPost = async (postData, imageFile = null) => {
+  try {
+    const formData = new FormData();
+
+    // Add text fields
+    formData.append('title', postData.title || '');
+    formData.append('content', postData.content);
+    if (postData.course_id) {
+      formData.append('course_id', postData.course_id);
+    }
+
+    // Add image file if provided
+    if (imageFile) {
+      formData.append('image', imageFile);
+    }
+
+    const response = await fetch('/api/posts', {
+      method: 'POST',
+      headers: {
+        'Authorization': \`Bearer \${token}\`
+        // Don't set Content-Type - let browser set it for FormData
+      },
+      body: formData
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || 'Failed to create post');
+    }
+
+    const post = await response.json();
+    return post;
+  } catch (error) {
+    console.error('Error creating post:', error);
+    throw error;
+  }
+};
+
+// Usage examples:
+await createPost({
+  title: 'React Hooks Tutorial',
+  content: 'Here\'s how to use useState...',
+  course_id: 'course_002'
+}, imageFile);
+
+await createPost({
+  content: 'Quick learning update!',
+  title: 'My Progress Today'
+});
+`,
+
+    "course_id_formatting": `
+// Helper function to format course IDs
+const formatCourseId = (courseId) => {
+  return \`course_\${courseId.toString().padStart(3, '0')}\`;
+};
+
+// Examples:
+formatCourseId(1)    // "course_001"
+formatCourseId(25)   // "course_025"
+formatCourseId(100)  // "course_100"
+`,
+
+    "image_upload_react": `
+// React component for post creation with image upload
+import React, { useState } from 'react';
+
+const CreatePostForm = ({ onPostCreated }) => {
+  const [title, setTitle] = useState('');
+  const [content, setContent] = useState('');
+  const [courseId, setCourseId] = useState('');
+  const [image, setImage] = useState(null);
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+
+    try {
+      const postData = {
+        title: title.trim() || undefined,
+        content: content.trim(),
+        course_id: courseId || undefined
+      };
+
+      const newPost = await createPost(postData, image);
+      onPostCreated(newPost);
+
+      // Reset form
+      setTitle('');
+      setContent('');
+      setCourseId('');
+      setImage(null);
+    } catch (error) {
+      alert('Failed to create post: ' + error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file && file.size <= 5 * 1024 * 1024) { // 5MB limit
+      setImage(file);
+    } else {
+      alert('Image must be smaller than 5MB');
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <input
+        type="text"
+        placeholder="Post title (optional)"
+        value={title}
+        onChange={(e) => setTitle(e.target.value)}
+      />
+
+      <textarea
+        placeholder="Share your thoughts..."
+        value={content}
+        onChange={(e) => setContent(e.target.value)}
+        required
+      />
+
+      <select value={courseId} onChange={(e) => setCourseId(e.target.value)}>
+        <option value="">Select course (optional)</option>
+        <option value="course_001">Beginner Guitar</option>
+        <option value="course_002">JavaScript Fundamentals</option>
+        <option value="course_003">International Cooking</option>
+      </select>
+
+      <input
+        type="file"
+        accept="image/*"
+        onChange={handleImageChange}
+      />
+
+      {image && <p>Image selected: {image.name}</p>}
+
+      <button type="submit" disabled={loading || !content.trim()}>
+        {loading ? 'Creating...' : 'Create Post'}
+      </button>
+    </form>
+  );
+};
+
+export default CreatePostForm;
+`,
+
+    "typescript_types": `
+// TypeScript interfaces for post creation
+interface CreatePostRequest {
+  title?: string;
+  content: string;
+  course_id?: string;  // "course_XXX" format
+  image?: File;        // File object for upload
+}
+
+interface Post {
+  id: number;
+  title?: string;
+  content: string;
+  photo_url?: string;
+  course_id?: number;
+  user_id: number;
+  thread_id?: number;
+  user: User;
+  course?: Course;
+  replies?: Post[];
+  replies_count?: number;
+  created_at: string;
+  updated_at: string;
+}
+
+// API response
+interface PostResponse extends Post {
+  // Full populated objects
+}
+`
+  },
+
+  "storage_setup": {
+    "laravel_commands": [
+      "php artisan storage:link  # Creates public/storage symlink",
+      "chmod -R 755 storage/    # Ensure proper permissions",
+      "chown -R www-data:www-data storage/  # Set correct ownership"
+    ],
+    "nginx_apache_config": {
+      "nginx": "Add location block for /storage/ to serve from storage/app/public/",
+      "apache": "Ensure .htaccess allows access to storage directory"
+    },
+    "file_access_urls": {
+      "local": "http://localhost:8000/storage/posts/filename.jpg",
+      "production": "https://yourdomain.com/storage/posts/filename.jpg"
+    }
+  }
+}

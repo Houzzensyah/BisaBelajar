@@ -36,6 +36,7 @@ class User extends Authenticatable
         'latitude',
         'longitude',
         'avatar_path',
+        'score'
     ];
 
     /**

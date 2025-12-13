@@ -14,6 +14,7 @@ class Swap extends Model
         'responder_id',
         'requester_skill_id',
         'responder_skill_id',
+        'description',
         'status', // pending, accepted, rejected, cancelled
     ];
 
