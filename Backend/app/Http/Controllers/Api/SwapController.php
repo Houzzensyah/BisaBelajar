@@ -17,7 +17,7 @@ class SwapController extends Controller
                 if ($request->has('user_id')) {
                     $query->where('responder_id', $request->user_id);
                 }
-            })->paginate(20);
+            })->orderBy('created_at', 'desc')->paginate(20);
 
         return response()->json($swaps);
     }
